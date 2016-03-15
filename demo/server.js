@@ -1,7 +1,8 @@
 var qiniu = require('qiniu');
 var express = require('express');
-var config = require('./config.js');
+var config = require('./cfg.js');
 var app = express();
+var  cors = require('cors');
 
 app.configure(function() {
     app.use(express.static(__dirname + '/'));
@@ -11,13 +12,83 @@ app.configure(function() {
 app.set('views', __dirname + '/views');
 app.engine('html', require('ejs').renderFile);
 
-app.use(express.urlencoded());
+// https://www.zhihu.com/question/27533465
+// http://blog.csdn.net/marujunyy/article/details/8852017
+// https://cnodejs.org/topic/51dccb43d44cbfa3042752c8
+// http://stackoverflow.com/questions/32500073/request-header-field-access-control-allow-headers-is-not-allowed-by-itself-in-pr
+// http://stackoverflow.com/questions/25727306/request-header-field-access-control-allow-headers-is-not-allowed-by-access-contr
+// http://frend.cc/javascript/2015/07/02/cross-origin.html
+app.use(cors());
+// app.all('*', function(req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "X-Requested-With");
+//     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+//     res.header("X-Powered-By",' 3.2.1')
+//     res.header("Content-Type", "application/json;charset=utf-8");
+//     next();
+// });
+
+// //allow custom header and CORS
+// app.all('*',function (req, res, next) {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
+//   res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+
+//   if (req.method == 'OPTIONS') {
+//     res.send(200); /*让options请求快速返回*/
+//   }
+//   else {
+//     next();
+//   }
+// });
+
+// Add headers
+// app.use(function (req, res, next) {
+
+//     // Website you wish to allow to connect
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+
+//     // Request methods you wish to allow
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+//     // Request headers you wish to allow
+//     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+//     // Set to true if you need the website to include cookies in the requests sent
+//     // to the API (e.g. in case you use sessions)
+//     res.setHeader('Access-Control-Allow-Credentials', true);
+
+//     // Pass to next layer of middleware
+//     next();
+// });
+
+// app.use(express.urlencoded());
 
 app.get('/uptoken', function(req, res, next) {
+
+    /**
+     * Request header field If-Modified-Since is not allowed by Access-Control-Allow-Headers in preflight response.
+     */
+
+    // Website you wish to allow to connect
+    // res.setHeader('Access-Control-Allow-Origin', '*');
+
+    // // Request methods you wish to allow
+    // res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+    // // Request headers you wish to allow
+    // res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+    // // Set to true if you need the website to include cookies in the requests sent
+    // // to the API (e.g. in case you use sessions)
+    // res.setHeader('Access-Control-Allow-Credentials', true);
+
+
+    // res.header("Cache-Control", "max-age=0, private, must-revalidate");
+    // res.header("Pragma", "no-cache");
+    // res.header("Expires", 0);
+
     var token = uptoken.token();
-    res.header("Cache-Control", "max-age=0, private, must-revalidate");
-    res.header("Pragma", "no-cache");
-    res.header("Expires", 0);
     if (token) {
         res.json({
             uptoken: token
@@ -68,6 +139,15 @@ app.get('/', function(req, res) {
 
 app.get('/multiple', function(req, res) {
     res.render('multiple.html', {
+        domain: config.Domain,
+        uptoken_url: config.Uptoken_Url
+    });
+});
+
+app.get('/custom', function(req, res) {
+
+
+    res.render('../custom.html', {
         domain: config.Domain,
         uptoken_url: config.Uptoken_Url
     });

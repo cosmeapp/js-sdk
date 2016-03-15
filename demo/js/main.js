@@ -14,8 +14,7 @@ $(function() {
         flash_swf_url: 'js/plupload/Moxie.swf',
         dragdrop: true,
         chunk_size: '4mb',
-        uptoken_url: $('#uptoken_url').val(),
-        domain: $('#domain').val(),
+
         get_new_uptoken: false,
         // downtoken_url: '/downtoken',
         // unique_names: true,
@@ -56,6 +55,7 @@ $(function() {
             },
             'FileUploaded': function(up, file, info) {
                 var progress = new FileProgress(file, 'fsUploadProgress');
+                // debugger;
                 progress.setComplete(up, info);
             },
             'Error': function(up, err, errTip) {
@@ -74,6 +74,7 @@ $(function() {
     });
 
     uploader.bind('FileUploaded', function() {
+        debugger;
         console.log('hello man,a file is uploaded');
     });
     $('#container').on(
