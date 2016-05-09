@@ -1,5 +1,6 @@
 .DS_Store
-Gruntfile.js
 node_modules
-
 demo/cfg.js
+bower_components
+demo/config.js
+

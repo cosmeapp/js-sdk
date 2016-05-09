@@ -64,6 +64,11 @@ app.use(cors());
 
 // app.use(express.urlencoded());
 
+app.use(express.urlencoded());
+app.use('/bower_components', express.static(__dirname + '/../bower_components'));
+app.use('/src', express.static(__dirname + '/../src'));
+
+
 app.get('/uptoken', function(req, res, next) {
 
     /**

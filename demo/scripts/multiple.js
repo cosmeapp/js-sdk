@@ -14,19 +14,8 @@ $(function() {
         flash_swf_url: 'js/plupload/Moxie.swf',
         dragdrop: true,
         chunk_size: '4mb',
-
-        get_new_uptoken: false,
-        // downtoken_url: '/downtoken',
-        // unique_names: true,
-        // save_key: true,
-        // x_vars: {
-        //     'id': '1234',
-        //     'time': function(up, file) {
-        //         var time = (new Date()).getTime();
-        //         // do something with 'time'
-        //         return time;
-        //     },
-        // },
+        uptoken_url: $('#uptoken_url').val(),
+        domain: $('#domain').val(),
         auto_start: true,
         init: {
             'FilesAdded': function(up, files) {
@@ -35,7 +24,6 @@ $(function() {
                 plupload.each(files, function(file) {
                     var progress = new FileProgress(file, 'fsUploadProgress');
                     progress.setStatus("等待...");
-                    progress.bindUploadCancel(up);
                 });
             },
             'BeforeUpload': function(up, file) {
@@ -48,6 +36,7 @@ $(function() {
             'UploadProgress': function(up, file) {
                 var progress = new FileProgress(file, 'fsUploadProgress');
                 var chunk_size = plupload.parseSize(this.getOption('chunk_size'));
+
                 progress.setProgress(file.percent + "%", file.speed, chunk_size);
             },
             'UploadComplete': function() {
@@ -55,7 +44,6 @@ $(function() {
             },
             'FileUploaded': function(up, file, info) {
                 var progress = new FileProgress(file, 'fsUploadProgress');
-                // debugger;
                 progress.setComplete(up, info);
             },
             'Error': function(up, err, errTip) {
@@ -64,19 +52,68 @@ $(function() {
                 progress.setError();
                 progress.setStatus(errTip);
             }
-                // ,
-                // 'Key': function(up, file) {
-                //     var key = "";
-                //     // do something with key
-                //     return key
-                // }
         }
     });
 
     uploader.bind('FileUploaded', function() {
-        debugger;
         console.log('hello man,a file is uploaded');
     });
+
+    var Q2 = new QiniuJsSDK();
+    var uploader2 = Q2.uploader({
+        runtimes: 'html5,flash,html4',
+        browse_button: 'pickfiles2',
+        container: 'container2',
+        drop_element: 'container2',
+        max_file_size: '100mb',
+        flash_swf_url: 'js/plupload/Moxie.swf',
+        dragdrop: true,
+        chunk_size: '4mb',
+        uptoken_url: $('#uptoken_url').val(),
+        domain: $('#domain').val(),
+        auto_start: true,
+        init: {
+            'FilesAdded': function(up, files) {
+                $('table').show();
+                $('#success').hide();
+                plupload.each(files, function(file) {
+                    var progress = new FileProgress(file, 'fsUploadProgress');
+                    progress.setStatus("等待...");
+                });
+            },
+            'BeforeUpload': function(up, file) {
+                var progress = new FileProgress(file, 'fsUploadProgress');
+                var chunk_size = plupload.parseSize(this.getOption('chunk_size'));
+                if (up.runtime === 'html5' && chunk_size) {
+                    progress.setChunkProgess(chunk_size);
+                }
+            },
+            'UploadProgress': function(up, file) {
+                var progress = new FileProgress(file, 'fsUploadProgress');
+                var chunk_size = plupload.parseSize(this.getOption('chunk_size'));
+
+                progress.setProgress(file.percent + "%", file.speed, chunk_size);
+            },
+            'UploadComplete': function() {
+                $('#success').show();
+            },
+            'FileUploaded': function(up, file, info) {
+                var progress = new FileProgress(file, 'fsUploadProgress');
+                progress.setComplete(up, info);
+            },
+            'Error': function(up, err, errTip) {
+                $('table').show();
+                var progress = new FileProgress(err.file, 'fsUploadProgress');
+                progress.setError();
+                progress.setStatus(errTip);
+            }
+        }
+    });
+
+    uploader2.bind('FileUploaded', function() {
+        console.log('hello man 2,a file is uploaded');
+    });
+
     $('#container').on(
         'dragenter',
         function(e) {
@@ -218,7 +255,7 @@ $(function() {
         var newUrl = Qiniu.pipeline(fopArr, key);
 
         var newImg = new Image();
-        img.attr('src', 'loading.gif');
+        img.attr('src', 'images/loading.gif');
         newImg.onload = function() {
             img.attr('src', newUrl);
             img.parent('a').attr('href', newUrl);
