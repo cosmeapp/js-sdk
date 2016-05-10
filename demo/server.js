@@ -68,6 +68,8 @@ app.use(express.urlencoded());
 app.use('/bower_components', express.static(__dirname + '/../bower_components'));
 app.use('/src', express.static(__dirname + '/../src'));
 
+app.use('/js', express.static(__dirname + '/js'));
+
 
 app.get('/uptoken', function(req, res, next) {
 
@@ -148,6 +150,15 @@ app.get('/multiple', function(req, res) {
         uptoken_url: config.Uptoken_Url
     });
 });
+
+app.get('/amd', function(req, res) {
+    res.render('requirejs-qiniu.html', {
+        domain: config.Domain,
+        uptoken_url: config.Uptoken_Url
+    });
+});
+
+
 
 app.get('/custom', function(req, res) {
 

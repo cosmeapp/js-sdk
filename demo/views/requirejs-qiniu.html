@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>七牛文件上传基于requirejs</title>
+    <link href="/images/favicon.ico" rel="shortcut icon">
+
+
+<link rel="stylesheet" type="text/css" href="//p.cosmeapp.com/s/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="//p.cosmeapp.com/s/??admin-lte/2.3.0/css/AdminLTE.min.css,admin-lte/2.3.0/css/skins/_all-skins.min.css">
+<link rel="stylesheet" href="//p.cosmeapp.com/s/font-awesome/4.2.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="//p.cosmeapp.com/s/ionicons/2.0.0/css/ionicons.min.css"/>
+
+<!-- <script src="//public.cosmeapp.com/s/??jquery/1.11.1/jquery.min.js"></script> -->
+<script src="//p.cosmeapp.com/s/requirejs/2.2.0/require.js"></script>
+<script type="text/javascript">
+require.config({
+    waitSeconds: 20,
+    paths: {
+　　　　  "jquery": "http://public.cosmeapp.com/s/jquery/1.11.1/jquery.min",
+        "text": "http://public.cosmeapp.com/s/requirejs-text/2.0.15/text",
+        "css": "http://public.cosmeapp.com/s/requirejs-css/css",
+
+　　　　　"underscore": "http://public.cosmeapp.com/s/underscore/1.8.3/underscore-min",
+        // 复制
+        "ZeroClipboard": "http://public.cosmeapp.com/s/zeroclipboard/2.2.0/ZeroClipboard.min",
+        "jquery-form": "http://public.cosmeapp.com/s/jquery-form/3.51.0/jquery.form",
+        "autosize": "http://public.cosmeapp.com/s/autosize/3.0.13/autosize.min",
+        "WdatePicker":"http://public.cosmeapp.com/s/My97DatePicker/4.8.4/WdatePicker.min",
+        "jquery.lazyload": "http://public.cosmeapp.com/s/jquery-lazyload/1.9.3/jquery.lazyload.min",
+
+        // 对话框
+        "ui-dialogCss": "http://public.cosmeapp.com/s/artDialog/6.0.3/ui-dialog",
+        "artDialog": "http://public.cosmeapp.com/s/artDialog/6.0.3/dialog-plus-min",
+        // 模板引擎
+        "artTemplate":"http://public.cosmeapp.com/s/artTemplate/3.0.3/template",
+
+        // 百度编辑器
+        "umeditorCss": "http://public.cosmeapp.com/s/umeditor/1.2.4/themes/default/css/umeditor",
+        "umeditor": "http://public.cosmeapp.com/s/umeditor/1.2.4/umeditor.min",
+        "umeditorLan": "http://public.cosmeapp.com/s/umeditor/1.2.4/lang/zh-cn/zh-cn",
+
+        // 封装
+        "qiniu-upfile":"http://public.cosmeapp.com/fis/admin/qiniu-upfile_cbd1d5a",
+        "qiniu-js-sdk": "http://public.cosmeapp.com/fis/qiniu/qiniu-js-sdk_104dfca",
+
+        "qiniu-sdk": "http://public.cosmeapp.com/s/??plupload/2.1.1/plupload.full.min.js,plupload/2.1.1/i18n/zh_CN.js,qiniu-js/1.0.15-beta/qiniu.js,qiniu-js/1.0.15-beta/ui.js",
+
+        //http://public.cosmeapp.com/s/??plupload/2.1.1/plupload.full.min.js,plupload/2.1.1/i18n/zh_CN.js,qiniu-js/1.0.15-beta/qiniu.js,qiniu-js/1.0.15-beta/ui.js
+
+        //http://public.cosmeapp.com/s/qiniu-js/1.0.15-beta/main.css
+
+        "adminLte": "http://p.cosmeapp.com/s/??bootstrap/3.3.6/js/bootstrap.min.js,admin-lte/2.3.0/js/app.min.js"
+　　 },
+    shim: {
+        'WdatePicker': {
+            // deps: ['backbone'],
+            exports: 'WdatePicker'
+        },
+        "jquery.lazyload":{
+            deps: ['jquery'],
+            exports: 'jQuery.fn.lazyload'
+        },
+        "artDialog": {
+            deps: ['jquery', 'css!ui-dialogCss'],
+            exports: 'dialog'
+        },
+        "adminLte": {
+            deps: ['jquery'],
+            exports: 'adminLte'
+        },
+        "umeditor": {
+            deps: ['jquery', 'css!umeditorCss'],
+            exports: 'UM'
+        },
+        "qiniu-js-sdk": {
+            deps: ['jquery', 'artTemplate']
+        },
+        "qiniu-upfile": {
+            deps: ['jquery', 'artTemplate']
+        }
+        // 'umeditorLan': {
+        //     deps: ['umeditor']
+        // }
+    }
+});
+</script>
+
+<!-- <script type="text/javascript" charset="utf-8" src="http://public.cosmeapp.com/s/umeditor/1.2.4/umeditor.min.js"></script> -->
+    <!-- <script type="text/javascript" src="http://public.cosmeapp.com/s/umeditor/1.2.4/lang/zh-cn/zh-cn.js"></script> -->
+
+<!-- <script src="//public.cosmeapp.com/fis/admin/qiniu-upfile_cbd1d5a.js"></script> -->
+
+<style type="text/css">
+    .qiniu-upfile-btn {
+      font-size: 18px;
+      background: #00b7ee;
+      border-radius: 3px;
+      line-height: 44px;
+      padding: 0 30px;
+      color: #fff;
+      display: block;
+      text-align: center;
+      margin: 0 10px;
+      cursor: pointer;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    }
+    .qiniu-upfile{ cursor: pointer;   overflow: hidden; position: relative; width: 100%; height: 100%; }
+    .qiniu-upfile-icon{ margin-top: 20px; width: 100%; height: 100px; background: url(http://static.cosmeapp.com/Fuuzz9lFfD077J98PlZQlb-N4GML?imageView2/2/w/88/h/75) no-repeat center top; }
+  .qiniu-container{ border: 3px dashed #e6e6e6; padding-top: 10px; }
+  .qiniu-container > .qiniu-upfile-btn { margin: 0 10px 10px; }
+  .qiniu-list{ overflow: hidden; }
+  .qiniu-item{ width: 200px; height: 200px; float: left; margin: 0  10px 10px; border: 1px solid #d7d7d7; position: relative; }
+  .qiniu-item > a{ display: block; width: 100%; height: 100%;  }
+  .qiniu-item > a > img{ max-width: 100%; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .qiniu-item [node-type="hinttext"], .qiniu-item .progress{ position: absolute; bottom: 0; width: 100%; margin: 0; text-align: center; }
+  .qiniu-item .progress{ height: 12px; bottom: 20px; }
+  .qiniu-item .close{ position: absolute; top: 0; right: 5px; }
+
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="qiniu-container" data-mz-qiniu='[{"format":"jpeg","width":755,"height":453,"colorModel":"ycbcr","key":"FqZ4E26SsVfEiEc6R5i5gKJESDH1","url":"http://huixisheng.qiniudn.com/FqZ4E26SsVfEiEc6R5i5gKJESDH1"},{"format":"jpeg","width":755,"height":453,"colorModel":"ycbcr","key":"FqZ4E26SsVfEiEc6R5i5gKJESDH1","url":"http://huixisheng.qiniudn.com/FqZ4E26SsVfEiEc6R5i5gKJESDH1"}]' role="mz-qiniu">
+        <div class="qiniu-upfile-btn">点击选择图片</div>
+    </div>
+
+    <div class="qiniu-container" role="mz-qiniu">
+        <div class="qiniu-upfile-btn">点击选择图片</div>
+        <div class="qiniu-list">
+            <div class="qiniu-item" style="display: none;">
+                <img src="http://img0.cosmeapp.com/FiEyRyLl7Agpy4Nw5GlFnbJKmxlW?imageMogr2/auto-orient/thumbnail/750x%3E/format/JPG">
+                <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <p class="bg-danger">上传失败,请重新上传</p>
+                <div class="progress">
+                  <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%">
+                    <span class="sr-only">20% Complete</span>
+                  </div>
+                </div>
+            </div>
+            <!-- <div class="qiniu-item">
+                <div class="qiniu-upfile">
+                    <div class="qiniu-upfile-icon"></div>
+                    <div class="qiniu-upfile-btn">点击选择图片</div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+
+</div>
+<script id="qiniu-item" type="text/html">
+    {{each image}}
+    <div data-key="{{$value.key}}" id="{{$value.key}}" class="qiniu-item">
+        <a href="{{$value.url}}" target="_blank"><img src="{{$value.url}}"></a>
+        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <p node-type="hinttext" class="bg-danger"></p>
+        <div class="progress" style="display: none;">
+          <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+            <span class="sr-only">0% Complete</span>
+          </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+<script src="/js/qiniu-upfile.js"></script>
+
+</body>
+</html>
