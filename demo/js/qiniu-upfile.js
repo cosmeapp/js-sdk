@@ -8,6 +8,11 @@
  * - 复制图片地址
  * - 750以上图片裁剪.max_file_width: 1242
  * - 过滤相同图片
+ *   - http://stackoverflow.com/questions/19261122/underscore-js-find-unique-values-in-array-of-objects-return-unique-items-and-th
+ *   - http://www.planabc.net/2009/12/26/array_uniq/
+ *   - http://www.codeceo.com/article/javascript-delete-array.html
+ *   - https://segmentfault.com/q/1010000000197274
+ *   - http://www.it610.com/article/1244718.htm
  */
 
 define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artDialog, artTemplate){
@@ -362,6 +367,3 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
 
 });
 
-require(['qiniu-upfile'], function($){
-
-});
