@@ -46,6 +46,9 @@ require.config({
 
         "qiniu-sdk": "http://public.cosmeapp.com/s/??plupload/2.1.1/plupload.full.min.js,plupload/2.1.1/i18n/zh_CN.js,qiniu-js/1.0.15-beta/qiniu.js,qiniu-js/1.0.15-beta/ui.js",
 
+        "qiniuUpfileCss": "http://public.cosmeapp.com/s/qiniu-upfile/0.0.3/qiniu-upfile",
+        //"qiniu-upfile":  "http://public.cosmeapp.com/s/qiniu-upfile/0.0.3/qiniu-upfile",
+
         //http://public.cosmeapp.com/s/??plupload/2.1.1/plupload.full.min.js,plupload/2.1.1/i18n/zh_CN.js,qiniu-js/1.0.15-beta/qiniu.js,qiniu-js/1.0.15-beta/ui.js
 
         //http://public.cosmeapp.com/s/qiniu-js/1.0.15-beta/main.css
@@ -53,6 +56,9 @@ require.config({
         "adminLte": "http://p.cosmeapp.com/s/??bootstrap/3.3.6/js/bootstrap.min.js,admin-lte/2.3.0/js/app.min.js"
 　　 },
     shim: {
+        'qiniu-upfile': {
+            deps: ['css!qiniuUpfileCss']
+        },
         'WdatePicker': {
             // deps: ['backbone'],
             exports: 'WdatePicker'
@@ -122,7 +128,9 @@ require.config({
             </div> -->
         </div>
     </div>
-
+    <div class="qiniu-container" config-mz-qiniu='{"rw": 2, "rh": 1, "input_name": "cover"}' data-mz-qiniu='[{"format":"jpeg","width":755,"height":453,"colorModel":"ycbcr","key":"FqZ4E26SsVfEiEc6R5i5gKJESDH1","url":"http://huixisheng.qiniudn.com/FqZ4E26SsVfEiEc6R5i5gKJESDH1"}]' role="mz-qiniu">
+        <div class="qiniu-upfile-btn">点击选择图片</div>
+    </div>
 
 </div>
 <script id="qiniu-item" type="text/html">

@@ -39,9 +39,9 @@ define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artD
      */
     function UploadProgress(file, up, itemRenderData){
         var container = up.getOption('container');
-        var $item = $('#' + file.id);
+        var multi_selection = up.getOption('multi_selection');
 
-        // @todo 单张处理
+        var $item = $('#' + file.id);
         var $container = $(container);
         if( !$container.length ){
             throw new Error('请设置config[\'container\']');
@@ -67,10 +67,16 @@ define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artD
                 }]
             };
             var data = $.extend(true, data, itemRenderData);
-            var html = artTemplate('qiniu-item', data);
+            var tplItem = '{{each image}}<div data-key="{{$value.key}}" id="{{$value.key}}" class="qiniu-item"><a href="{{$value.url}}" target="_blank"><img src="{{$value.url}}"></a><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button><p node-type="hinttext" class="bg-danger"></p><div class="progress" style="display: none;"><div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only">0% Complete</span></div></div></div>    {{/each}}';
+            var render = artTemplate.compile(tplItem);
+            var html = render(data);
+            // var html = artTemplate('qiniu-item', data);
+            if( !multi_selection ){
+                $itemContainer.html('');
+                this.$input.val('');
+            }
             $item = $(html).appendTo($itemContainer);
             this.$item = $item;
-            // $item.attr('id', file.id);
 
             this.setStatus('等待中，正在上传...', 'bg-info');
             this.bindUploadCancel();
@@ -200,10 +206,16 @@ define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artD
             var $container = this.$container;
             var inputName = uploader.getOption('input_name');
             var $input = $container.find('[name="' + inputName + '"]');
+            var multi_selection = uploader.getOption('multi_selection');
             var content = $.trim($input.val()) || '[]';
             var list = JSON.parse(content);
             if( $.type(value) == 'object' ){
-                list.push(value);
+                if( !multi_selection ){
+                    list = value;
+                } else {
+                    list.push(value);
+                }
+
             }
             if( $.isArray(value) ){
                 list = list.concat(value);
@@ -220,6 +232,7 @@ define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artD
     }
     return UploadProgress;
 });
+
 
 define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qiniu, UploadProgress){
 
@@ -262,11 +275,14 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
         var settings = {
             rw: 5,
             rh: 3,
-            uptoken_url: '/uptoken',
-            domain: 'http://huixisheng.qiniudn.com/',
+            uptoken_url: '/ajax/upload-token/',
+            domain: 'http://static.cosmeapp.com/',
+            // uptoken_url: '/uptoken',
+            // domain: 'http://huixisheng.qiniudn.com/',
             input_name: 'image',
             max_file_width: 1242,// 图片的最大宽度
             runtimes: 'html5,html4',
+            multi_selection: false,
             // browse_button: $('.qiniu-upfile-btn')[0],
             // container: $('.qiniu-container')[0],
             // drop_element: $('.qiniu-container')[0],
@@ -274,7 +290,7 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
             // @todo 资源上传
             // flash_swf_url: 'js/plupload/Moxie.swf',
             dragdrop: true,
-            chunk_size: '2mb',
+            chunk_size: '4mb',
             //上传失败最大重试次数
             max_retries: 3,
 
@@ -305,6 +321,7 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
             auto_start: true
         }
         var config = $.extend(true, settings, cfg);
+
         config.init = defaultInit;
         this.config = config;
         // var qjs = new QiniuJsSDK();
@@ -354,6 +371,8 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
                 config.container = container;
                 config.drop_element = drop_element;
                 config.render_data = render_data;
+                var cfg = JSON.parse($this.attr('config-mz-qiniu') || '{}');
+                config = $.extend(true, config, cfg);
 
                 var qiniuUpfile = new QiniuUpfile(config);
                 qiniuUpfile.preview();

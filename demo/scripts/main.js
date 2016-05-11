@@ -6,7 +6,8 @@
 
 $(function() {
     var uploader = Qiniu.uploader({
-        runtimes: 'html5,flash,html4',
+        // runtimes: 'html5,flash,html4',
+        runtimes: 'html4',
         browse_button: 'pickfiles',
         container: 'container',
         drop_element: 'container',
