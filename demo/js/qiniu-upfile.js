@@ -162,10 +162,11 @@ define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artD
                 var $item = $(this).parents('.qiniu-item');
                 var key = $item.attr('data-key') || '';
                 self.setInputValues(key);
+                $item.remove();
+                // @todo 已经上传如何判断
                 if( file['name'] ){
                     uploader.removeFile(file);
                 }
-                $item.off().remove();
             });
         },
         // 设置状态
@@ -217,15 +218,21 @@ define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artD
                 }
 
             }
-            if( $.isArray(value) ){
+            if( $.isArray(value) && $.isArray(list) ){
                 list = list.concat(value);
             }
             if( typeof value === "string" ){
-                list.forEach(function(item, index){
-                    if( item['key'] == value ){
-                        list.splice(index, 1);
+                if( $.isArray(list) ){
+                    list.forEach(function(item, index){
+                        if( item['key'] == value ){
+                            list.splice(index, 1);
+                        }
+                    });
+                } else if( $.type(list) == 'object' ){
+                    if( list['key'] == value ){
+                        list = [];
                     }
-                });
+                }
             }
             $input.val(JSON.stringify(list));
         }
@@ -364,6 +371,14 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
                 var $this = $(this);
                 var dataMzQiniu = $this.attr('data-mz-qiniu') || '[]';
                 var render_data = JSON.parse(dataMzQiniu);
+                // 剔除url为空的预览
+                for(var i = 0; i < render_data.length; i++ ){
+                    if( render_data[i]['url'] == '' ){
+                        render_data.splice(i, 1);
+                        i--;
+                    }
+                }
+
                 var browse_button = $this.find('.qiniu-upfile-btn')[0];
                 var container = $this[0];
                 var drop_element = $this[0];
