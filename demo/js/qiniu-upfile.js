@@ -352,12 +352,17 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
         preview: function(){
             var uploader = this.uploader;
             var renderData = this.config['render_data'];
+            var multi_selection = uploader.getOption('multi_selection');
             if( $.isArray(renderData) && renderData.length > 0  ){
                 var file = {};
                 var itemRenderData = {};
                 itemRenderData.image = renderData;
                 var progress = new UploadProgress(file, uploader, itemRenderData);
-                progress.setInputValues(renderData);
+                if( !multi_selection ){
+                    progress.setInputValues(renderData[0]);
+                } else {
+                    progress.setInputValues(renderData);
+                }
                 progress.setStatus('上传完成', 'bg-success');
             }
         }
@@ -371,6 +376,9 @@ define('qiniu-upfile',['jquery', 'qiniu-sdk', 'uploadProgress'], function($, qin
                 var $this = $(this);
                 var dataMzQiniu = $this.attr('data-mz-qiniu') || '[]';
                 var render_data = JSON.parse(dataMzQiniu);
+                if( $.type(render_data) == 'object'){
+                    render_data = [render_data];
+                }
                 // 剔除url为空的预览
                 for(var i = 0; i < render_data.length; i++ ){
                     if( render_data[i]['url'] == '' ){

@@ -37,8 +37,8 @@ fis.set('project.fileType.text', 'md');
 // });
 
 
-var qiniuVersionJs = '/qiniu-upfile/0.0.6/qiniu-upfile.js';
-var qiniuVersionCss = '/qiniu-upfile/0.0.6/qiniu-upfile.css';
+var qiniuVersionJs = '/qiniu-upfile/0.0.7/qiniu-upfile.js';
+var qiniuVersionCss = '/qiniu-upfile/0.0.7/qiniu-upfile.css';
 
 fis
     .media('qiniu-upfile')

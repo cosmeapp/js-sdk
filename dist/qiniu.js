@@ -6,7 +6,7 @@
  *
  * GitHub: http://github.com/qiniu/js-sdk
  *
- * Date: 2016-4-15
+ * Date: 2016-5-14
 */
 
 /*global plupload ,mOxie*/
