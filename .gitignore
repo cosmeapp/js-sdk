@@ -4,4 +4,5 @@ demo/cfg.js
 bower_components
 demo/config.js
 .cache/
+npm-debug.log
 

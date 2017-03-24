@@ -15,9 +15,9 @@
  *   - http://www.it610.com/article/1244718.htm
  */
 
-define('uploadProgress',['jquery', 'artDialog', 'artTemplate'], function($, artDialog, artTemplate){
+define('uploadProgress', ['jquery', 'artDialog', 'artTemplate'], function($, artDialog, artTemplate){
 
-    var LOADING_IMG = 'http://static.cosmeapp.com/nodeqn/0e6e0f46d7-128-128.gif';
+    var LOADING_IMG = 'http://img0.cosmeapp.com/nodeqn/0e6e0f46d7-128-128.gif';
     var HINT = {
         'FileUploaded': '图片上传',
         'tokenError': '获取下载token失败',

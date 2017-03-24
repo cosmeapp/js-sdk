@@ -2,7 +2,7 @@ var qiniu = require('qiniu');
 var express = require('express');
 var config = require('./cfg.js');
 var app = express();
-var  cors = require('cors');
+var cors = require('cors');
 
 app.configure(function() {
     app.use(express.static(__dirname + '/'));
@@ -98,7 +98,8 @@ app.get('/uptoken', function(req, res, next) {
     var token = uptoken.token();
     if (token) {
         res.json({
-            uptoken: token
+            uptoken: token,
+            domain: config.Domain
         });
     }
 });

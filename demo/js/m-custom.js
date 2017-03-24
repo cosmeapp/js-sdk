@@ -40,7 +40,7 @@ function QiniuUploader(cfg){
         }
 
     }
-    this.config = $.extend(defaults, cfg, true);
+    this.config = $.extend(true, defaults, cfg);
     this._init();
 }
 QiniuUploader.prototype = {
