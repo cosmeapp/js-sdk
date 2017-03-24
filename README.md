@@ -14,18 +14,26 @@ Qiniu-JavaScript-SDK
 
 Qiniu-JavaScript-SDK （下文简称为 JS-SDK）适用于 IE8+、Chrome、Firefox、Safari 等浏览器，基于七牛云存储官方 API 构建，其中上传功能基于 [Plupload](http://www.plupload.com/) 插件封装。开发者基于 JS-SDK 可以方便的从浏览器端上传文件至七牛云存储，并对上传成功后的图片进行丰富的数据处理操作。
 
+不考虑兼容性的情况下，如手机端，建议直接使用 Formdata 结合七牛[表单上传](https://developer.qiniu.com/kodo/manual/form-upload)的方式上传文件。
+
+[ Formdata 上传 demo ](http://jssdk.demo.qiniu.io/formdata)
+
+![ Formdata ](http://oky1vwhqm.bkt.clouddn.com/1486368013.png)
+
 Qiniu-JavaScript-SDK  为客户端 SDK，没有包含 token 生成实现，为了安全，token 建议通过网络从服务端获取，具体生成代码可以参考以下服务端 SDK 的文档。
 
-- [Java](http://developer.qiniu.com/code/v7/sdk/android.html)
-- [PHP](http://developer.qiniu.com/code/v7/sdk/php.html)
-- [Python](http://developer.qiniu.com/code/v7/sdk/python.html)
-- [Ruby](http://developer.qiniu.com/code/v6/sdk/ruby.html)
-- [Go](http://developer.qiniu.com/code/v7/sdk/go.html)
-- [Node.js](http://developer.qiniu.com/code/v6/sdk/nodejs.html) 
-- [C#](http://developer.qiniu.com/code/v6/sdk/csharp.html)
-- [C/C++](http://developer.qiniu.com/code/v6/sdk/cpp.html)
+- [Android](https://developer.qiniu.com/kodo/sdk/android)
+- [Java](https://developer.qiniu.com/kodo/sdk/java)
+- [PHP](https://developer.qiniu.com/kodo/sdk/php)
+- [Python](https://developer.qiniu.com/kodo/sdk/python)
+- [Ruby](https://developer.qiniu.com/kodo/sdk/ruby)
+- [Go](https://developer.qiniu.com/kodo/sdk/go)
+- [Node.js](https://developer.qiniu.com/kodo/sdk/nodejs)
+- [C#](https://developer.qiniu.com/kodo/sdk/csharp)
+- [C/C++](https://developer.qiniu.com/kodo/sdk/cpp)
+- [Objective-C](https://developer.qiniu.com/kodo/sdk/objc)
 
-Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js 服务器端 SDK ](http://developer.qiniu.com/code/v6/sdk/nodejs.html) 开发的。
+Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js 服务器端 SDK ](https://developer.qiniu.com/kodo/sdk/nodejs) 开发的。
 
 <!--
 本 SDK 可使开发者忽略上传底层实现细节，而更多的关注 UI 层的展现。
@@ -80,11 +88,11 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
 - JS-SDK 的上传功能基于 [Plupload](http://www.plupload.com/) 插件封装的，所以需要[下载 Plupload](http://plupload.com/download)，建议使用 2.1.1 版本。
     您也可以访问[ 开放静态文件 CDN ](http://staticfile.org/)，搜索 plupload，使用 CDN 加速的静态文件地址。
 
-- 在使用 JS-SDK 之前，您必须先注册一个七牛帐号，并登录控制台获取一对有效的 AccessKey 和 SecretKey，您可以阅读[ 如何接入七牛 ](http://developer.qiniu.com/article/kodo/kodo-first/quickstart.html)和[ 安全机制 ](http://developer.qiniu.com/article/kodo/kodo-developer/index.html#security) 以进一步了解如何正确使用和管理密钥 。
+- 在使用 JS-SDK 之前，您必须先注册一个七牛帐号，并登录控制台获取一对有效的 AccessKey 和 SecretKey，您可以阅读[ 快速入门 ](https://developer.qiniu.com/kodo/manual/console-quickstart)和[ 安全机制 ](https://developer.qiniu.com/kodo/manual/security#security) 以进一步了解如何正确使用和管理密钥 。
 
 - JS-SDK 依赖服务端颁发 uptoken，可以通过以下二种方式实现：
-    - 利用[七牛服务端 SDK ](http://developer.qiniu.com/resource/official.html#sdk)构建后端服务   
-    - 利用七牛底层 API 构建服务，详见七牛[上传策略](http://developer.qiniu.com/article/developer/security/put-policy.html)和[上传凭证](http://developer.qiniu.com/article/developer/security/upload-token.html)
+    - 利用[七牛服务端 SDK ](https://developer.qiniu.com/sdk#sdk)构建后端服务
+    - 利用七牛底层 API 构建服务，详见七牛[上传策略](https://developer.qiniu.com/kodo/manual/put-policy)和[上传凭证](https://developer.qiniu.com/kodo/manual/upload-token)
 
     后端服务应提供一个 URL 地址，供 JS-SDK 初始化使用，前端通过 Ajax 请求该地址后获得 uptoken。Ajax 请求成功后，服务端应返回如下格式的 json：
 
@@ -108,7 +116,7 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
 - 使用 Bower 安装
 
     Bower 是一个客户端技术的软件包管理器，它可用于搜索、安装和卸载如 JavaScript、HTML、CSS 之类的网络资源。如果需要更详细的关于 Bower 的使用说明，您可以访问[ Bower 官方网站](http://bower.io/)。
-    
+
     通过 Bower 安装会将 JS-SDK 依赖的 plupload 也一起安装在 `bower_components` 中：
 
     ```
@@ -136,7 +144,7 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
 - 使用 NPM 安装
 
     NPM 的全称是 Node Package Manager，是一个[ NodeJS ](https://nodejs.org)包管理和分发工具，已经成为了非官方的发布 Node 模块（包）的标准。如果需要更详细的关于 NPM 的使用说明，您可以访问[ NPM 官方网站](https://www.npmjs.com)，或对应的[中文网站](http://www.npmjs.com.cn/)
-    
+
     ```
     npm install qiniu-js
     ```
@@ -189,8 +197,8 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
         // downtoken_url: '/downtoken',
         // Ajax请求downToken的Url，私有空间时使用,JS-SDK 将向该地址POST文件的key和domain,服务端返回的JSON必须包含`url`字段，`url`值为该文件的下载地址
         // unique_names: true,              // 默认 false，key 为文件名。若开启该选项，JS-SDK 会为每个文件自动生成key（文件名）
-        // save_key: true,                  // 默认 false。若在服务端生成 uptoken 的上传策略中指定了 `sava_key`，则开启，SDK在前端将不对key进行任何处理
-        domain: '<Your bucket domain>',     // bucket 域名，下载资源时用到，**必需**
+        // save_key: true,                  // 默认 false。若在服务端生成 uptoken 的上传策略中指定了 `save_key`，则开启，SDK在前端将不对key进行任何处理
+        domain: '<Your bucket domain>',     // bucket 域名，下载资源时用到，如：'http://xxx.bkt.clouddn.com/' **必需**
         container: 'container',             // 上传区域 DOM ID，默认是 browser_button 的父元素，
         max_file_size: '100mb',             // 最大文件体积限制
         flash_swf_url: 'path/of/plupload/Moxie.swf',  //引入 flash,相对路径
@@ -261,7 +269,7 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
     ```
 
 - 如果一个页面中有多个上传实例，可以如下操作
-    
+
     ```JavaScript
     var option1 = {
         key : val ,
@@ -321,9 +329,9 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
      }, key);
 
     ```
-    
-    具体水印参数解释见[水印（watermark）](http://developer.qiniu.com/docs/v6/api/reference/fop/image/watermark.html)
-    
+
+    具体水印参数解释见[水印（watermark）](https://developer.qiniu.com/dora/api/image-watermarking-processing-watermark)
+
 - imageView2
 
     ```JavaScript
@@ -337,8 +345,8 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
      }, key);
 
     ```
-    具体缩略参数解释见[图片处理（imageView2）](http://developer.qiniu.com/docs/v6/api/reference/fop/image/imageview2.html)
-    
+    具体缩略参数解释见[图片基本处理（imageView2）](https://developer.qiniu.com/dora/api/basic-processing-images-imageview2)
+
 - imageMogr2
 
     ```JavaScript
@@ -357,14 +365,14 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
 
     ```
 
-    具体高级图像处理参数解释见[高级图像处理（imageMogr2）](http://developer.qiniu.com/docs/v6/api/reference/fop/image/imagemogr2.html)
-    
+    具体高级图像处理参数解释见[图像高级处理（imageMogr2）](https://developer.qiniu.com/dora/api/the-advanced-treatment-of-images-imagemogr2)
+
 - imageInfo
 
     ```JavaScript
     var imageInfoObj = Qiniu.imageInfo(key);
     ```
-    具体 imageInfo 解释见[图片基本信息（imageInfo）](http://developer.qiniu.com/docs/v6/api/reference/fop/image/imageinfo.html)
+    具体 imageInfo 解释见[图片基本信息（imageInfo）](https://developer.qiniu.com/dora/api/pictures-basic-information-imageinfo)
 
     Ajax跨域限制，IE系列此函数只支持IE10+
 
@@ -374,10 +382,10 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
     var exifOjb = Qiniu.exif(key);
     ```
 
-    具体 exif 解释见[图片EXIF信息（exif）](http://developer.qiniu.com/docs/v6/api/reference/fop/image/exif.html)
+    具体 exif 解释见[图片EXIF信息（exif）](https://developer.qiniu.com/dora/api/photo-exif-information-exif)
 
     Ajax跨域限制，IE系列此函数只支持IE10+
-    
+
 - pipeline(管道操作）
 
     ```JavaScript
@@ -443,31 +451,31 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
     var imgLink = Qiniu.pipeline(fopArr, key));
 
     ```
-    
-    具体管道操作解释见[管道操作](http://developer.qiniu.com/docs/v6/api/overview/fop/pipeline.html)
+
+    具体管道操作解释见[管道操作](https://developer.qiniu.com/dora/manual/processing-mechanism)
 
 <a id="demo"></a>
 ### 运行示例
 
-1. 进入项目根目录，执行 `make install` 安装依赖第三方库
+1. 进入项目根目录，执行 `make install` 或 `npm install & bower install` 安装依赖第三方库
 2. 进入 `demo` 目录，按照目录下的 `config.example` 示例，创建 `config.js` 文件，其中，`Access Key` 和 `Secret Key` 按如下方式获取
-   
+
     * [开通七牛开发者帐号](https://portal.qiniu.com/signup)
-    * [登录七牛开发者自助平台，查看 AccessKey 和 SecretKey](https://portal.qiniu.com/setting/key) 。
-    
+    * [登录七牛开发者自助平台，查看 AccessKey 和 SecretKey](https://portal.qiniu.com/user/key) 。
+
     ```javascript
-    
+
     module.exports = {
         'ACCESS_KEY': '<Your Access Key>',
         'SECRET_KEY': '<Your Secret Key>',
         'Bucket_Name': '<Your Bucket Name>',
         'Port': 19110,
-        'Uptoken_Url': '<Your Uptoken_Url>',
-        'Domain': '<Your Bucket Domain>'
+        'Uptoken_Url': '<Your Uptoken_Url>', // demo 启动后会在本地 /uptoken 上提供获取 uptoken 的接口，所以这里可以填 'uptoken'
+        'Domain': '<Your Bucket Domain>' // Bucket 的外链默认域名，在 Bucket 的内容管理里查看，如：'http://xxx.bkt.clouddn.com/'
     }
-    
+
     ```
-3. 进入项目根目录，执行 `make dev` 访问 `http://127.0.0.1:19110/` 或 `http://localhost:19110/`
+3. 进入项目根目录，执行 `make dev` 或 `node demo/server.js` 访问命令行打印出的 demo 地址。
 
 <a id="note"></a>
 ### 说明
@@ -476,14 +484,14 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
 
 2. JS-SDK 依赖 uptoken，可以直接设置 `uptoken`  、通过提供 Ajax 请求地址 `uptoken_url` 或者通过提供一个能够返回 uptoken 的函数 `uptoken_func` 实现。
 
-3. 如果您想了解更多七牛的上传策略，建议您仔细阅读 [七牛官方文档-上传](http://developer.qiniu.com/code/v6/api/kodo-api/index.html#up)。
+3. 如果您想了解更多七牛的上传策略，建议您仔细阅读 [七牛官方文档-上传](https://developer.qiniu.com/kodo/manual/upload-types)。
    另外，七牛的上传策略是在后端服务指定的，JS-SDK 的 setOption API 只是设置 Plupload 的初始化参数，和上传策略无关。
 
-4. 如果您想了解更多七牛的图片处理，建议您仔细阅读 [七牛官方文档-图片处理](http://developer.qiniu.com/code/v6/api/kodo-api/index.html#image)
+4. 如果您想了解更多七牛的图片处理，建议您仔细阅读 [七牛官方文档-图片处理](https://developer.qiniu.com/dora/api/image-processing-api)
 
 5. 如果是 https 网站，上传地址为 https://up.qbox.me 否则使用 http://upload.qiniu.com
 
-6. JS-SDK 示例生成 uptotken 时，指定的 `Bucket Name` 为公开空间，所以可以公开访问上传成功后的资源。若您生成 uptoken 时，指定的 `Bucket Name` 为私有空间，那您还需要在服务端进行额外的处理才能访问您上传的资源。具体参见[下载凭证](http://developer.qiniu.com/article/developer/security/download-token.html)。JS-SDK 数据处理部分功能不适用于私有空间。
+6. JS-SDK 示例生成 uptotken 时，指定的 `Bucket Name` 为公开空间，所以可以公开访问上传成功后的资源。若您生成 uptoken 时，指定的 `Bucket Name` 为私有空间，那您还需要在服务端进行额外的处理才能访问您上传的资源。具体参见[下载凭证](https://developer.qiniu.com/kodo/manual/download-token)。JS-SDK 数据处理部分功能不适用于私有空间。
 
 <a id="faq"></a>
 ### 常见问题
@@ -615,7 +623,7 @@ public class MainActivity extends Activity {
         webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebViewClient(new WebViewClient(){
             public boolean shouldOverrideUrlLoading(WebView view, String url){
-                view.loadUrl(url); 
+                view.loadUrl(url);
                 return true;
             }
         });
@@ -624,8 +632,8 @@ public class MainActivity extends Activity {
 
 }
 ```
-但是点击选择文件按钮没有反应，这个是Webview对JS不是很支持造成的，解决方法可以引入这个Webview,jar包地址如下: 
-https://github.com/delight-im/Android-AdvancedWebView/blob/master/JARs/Android-AdvancedWebView.jar 
+但是点击选择文件按钮没有反应，这个是Webview对JS不是很支持造成的，解决方法可以引入这个Webview,jar包地址如下:
+https://github.com/delight-im/Android-AdvancedWebView/blob/master/JARs/Android-AdvancedWebView.jar
 使用的方法文档上都有写，比较简单：
 ```
 private AdvancedWebView mWebView;
@@ -643,7 +651,7 @@ private AdvancedWebView mWebView;
 **11.关于多个按钮选择文件的Demo **
 
 很多用户都在问JSSDK多文件选择的Demo，其实比较简单，只需要在main.js文件里面多new几个Uploader对象就可以了，然后在主页面上里面写好对应的上传的按钮就可以了
-这里直接给出main.js和indxe.html里面需要改动的地方: 
+这里直接给出main.js和indxe.html里面需要改动的地方:
 main.js里面多new几个uploader对象
 ```
 $(function() {
@@ -773,7 +781,7 @@ $(function() {
 ```
 相应的index.html文件加入相关按钮:
 ```
-<div id="container">
+  <div id="container">
         <a class="btn btn-default btn-lg " id="pickfiles" style="width:160px" href="#" >
             <i class="glyphicon glyphicon-plus"></i>
             <span>选择文件</span>
@@ -781,14 +789,14 @@ $(function() {
 
         <a class="btn btn-default btn-lg " id="up_load" style="width:160px" href="#" >
             <span>确认上传</span>
-        </a>  
+        </a>
 
         <a class="btn btn-default btn-lg " id="stop_load" style="width:160px" href="#" >
             <span>暂停上传</span>
-        </a> 
-    </div>
+        </a>
+  </div>
 
-<div id="container2">
+  <div id="container2">
         <a class="btn btn-default btn-lg " id="pickfiles2" style="width:160px" href="#" >
             <i class="glyphicon glyphicon-plus"></i>
             <span>选择文件</span>
@@ -796,13 +804,12 @@ $(function() {
 
         <a class="btn btn-default btn-lg " id="up_load2" style="width:160px" href="#" >
             <span>确认上传</span>
-        </a>  
+        </a>
 
         <a class="btn btn-default btn-lg " id="stop_load2" style="width:160px" href="#" >
             <span>暂停上传</span>
-        </a> 
-    </div>
-</div>
+        </a>
+  </div>
 ```
 
 
@@ -823,10 +830,6 @@ $(function() {
 <a id="license"></a>
 ### 许可证
 
-> Copyright (c) 2014 qiniu.com
+> Copyright (c) 2017 qiniu.com
 
-### 基于 GPL V2 协议发布:
-
-> [www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)
-
-
+### 基于 MIT 协议发布

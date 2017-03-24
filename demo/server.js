@@ -162,11 +162,24 @@ app.get('/amd', function(req, res) {
 
 
 app.get('/custom', function(req, res) {
-
-
     res.render('../custom.html', {
         domain: config.Domain,
         uptoken_url: config.Uptoken_Url
+});
+
+app.get('/formdata', function(req, res) {
+    var token = uptoken.token();
+    res.render('formdata.html', {
+        domain: config.Domain,
+        uptoken: token
+    });
+});
+
+app.get('/performance', function(req, res) {
+    var token = uptoken.token();
+    res.render('performance.html', {
+        uptoken: token
+
     });
 });
 
@@ -177,5 +190,11 @@ var uptoken = new qiniu.rs.PutPolicy(config.Bucket_Name);
 
 
 app.listen(config.Port, function() {
-    console.log('Listening on port %d', config.Port);
+    console.log('Listening on port %d\n', config.Port);
+    console.log('▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽  Demos  ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽ ▽')
+    console.log(' ▹▹▹▹▹▹▹▹▹▹▹▹▹▹▹▹  Upload: http://127.0.0.1:%d   ◁ ◁ ◁ ◁ ◁ ◁ ◁', config.Port);
+    console.log(' ▹▹▹▹▹▹▹  Multiple upload: http://127.0.0.1:%d/multiple  ◁ ◁ ◁', config.Port);
+    console.log(' ▹▹▹▹▹▹▹  Formdata upload: http://127.0.0.1:%d/formdata  ◁ ◁ ◁', config.Port);
+    console.log(' ▹▹▹▹▹▹▹  Up  Performance: http://127.0.0.1:%d/performance ◁ ◁', config.Port);
+    console.log('△ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △ △\n');
 });

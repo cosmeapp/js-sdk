@@ -15,7 +15,7 @@ $(function() {
         flash_swf_url: 'bower_components/plupload/js/Moxie.swf',
         dragdrop: true,
         chunk_size: '4mb',
-        multi_selection: !(mOxie.Env.OS.toLowerCase()==="ios"),
+        multi_selection: !(moxie.core.utils.Env.OS.toLowerCase()==="ios"),
         uptoken_url: $('#uptoken_url').val(),
         // uptoken_func: function(){
         //     var ajax = new XMLHttpRequest();
@@ -48,6 +48,9 @@ $(function() {
         auto_start: true,
         log_level: 5,
         init: {
+            'BeforeChunkUpload':function (up,file) {
+                console.log("before chunk upload:",file.name);
+            },
             'FilesAdded': function(up, files) {
                 $('table').show();
                 $('#success').hide();
@@ -58,6 +61,7 @@ $(function() {
                 });
             },
             'BeforeUpload': function(up, file) {
+                console.log("this is a beforeupload function from init");
                 var progress = new FileProgress(file, 'fsUploadProgress');
                 var chunk_size = plupload.parseSize(this.getOption('chunk_size'));
                 if (up.runtime === 'html5' && chunk_size) {
@@ -91,9 +95,10 @@ $(function() {
                 // }
         }
     });
-
-    uploader.bind('FileUploaded', function() {
-        debugger;
+    uploader.bind('BeforeUpload', function () {
+        console.log("hello man, i am going to upload a file");
+    });
+    uploader.bind('FileUploaded', function () {
         console.log('hello man,a file is uploaded');
     });
     $('#container').on(

@@ -9,7 +9,7 @@
  * Date: @DATE
 */
 
-/*global plupload ,mOxie*/
+/*global plupload ,moxie*/
 /*global ActiveXObject */
 /*exported Qiniu */
 /*exported QiniuJsSDK */
@@ -160,6 +160,16 @@ function QiniuJsSDK() {
         "http://up.qiniu.com"
     ];
 
+    var qiniuUpHosts = {
+       "http": [
+           "http://upload.qiniu.com",
+           "http://up.qiniu.com"
+       ],
+       "https": [
+           "https://up.qbox.me"
+       ]
+    };
+
     var changeUrlTimes = 0;
 
     /**
@@ -170,17 +180,14 @@ function QiniuJsSDK() {
      *     it will set 'qiniuUploadUrl' value with 'qiniuUploadUrls' looply
      */
     this.resetUploadUrl = function(){
-        if (window.location.protocol === 'https:') {
-            qiniuUploadUrl = 'https://up.qbox.me';
-        } else {
-            var i = changeUrlTimes % qiniuUploadUrls.length;
-            qiniuUploadUrl = qiniuUploadUrls[i];
-            changeUrlTimes++;
-        }
-        logger.debug('resetUploadUrl: '+qiniuUploadUrl);
+	var hosts = window.location.protocol === 'https:' ? qiniuUpHosts.https : qiniuUpHosts.http;
+	var i = changeUrlTimes % hosts.length;
+	qiniuUploadUrl = hosts[i];
+	changeUrlTimes++;
+	logger.debug('resetUploadUrl: '+qiniuUploadUrl);
     };
 
-    this.resetUploadUrl();
+    // this.resetUploadUrl();
 
 
     /**
@@ -286,6 +293,62 @@ function QiniuJsSDK() {
         return utftext;
     };
 
+    this.base64_decode = function (data) {
+        // http://kevin.vanzonneveld.net
+        // +   original by: Tyler Akins (http://rumkin.com)
+        // +   improved by: Thunder.m
+        // +      input by: Aman Gupta
+        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // +   bugfixed by: Onno Marsman
+        // +   bugfixed by: Pellentesque Malesuada
+        // +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // +      input by: Brett Zamir (http://brett-zamir.me)
+        // +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+        // *     example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
+        // *     returns 1: 'Kevin van Zonneveld'
+        // mozilla has this native
+        // - but breaks in 2.0.0.12!
+        //if (typeof this.window['atob'] == 'function') {
+        //    return atob(data);
+        //}
+        var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+        ac = 0,
+        dec = "",
+        tmp_arr = [];
+
+        if (!data) {
+            return data;
+        }
+
+        data += '';
+
+        do { // unpack four hexets into three octets using index points in b64
+            h1 = b64.indexOf(data.charAt(i++));
+            h2 = b64.indexOf(data.charAt(i++));
+            h3 = b64.indexOf(data.charAt(i++));
+            h4 = b64.indexOf(data.charAt(i++));
+
+            bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+            o1 = bits >> 16 & 0xff;
+            o2 = bits >> 8 & 0xff;
+            o3 = bits & 0xff;
+
+            if (h3 === 64) {
+                tmp_arr[ac++] = String.fromCharCode(o1);
+            } else if (h4 === 64) {
+                tmp_arr[ac++] = String.fromCharCode(o1, o2);
+            } else {
+                tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
+            }
+        } while (i < data.length);
+
+        dec = tmp_arr.join('');
+
+        return dec;
+    };
+
     /**
      * encode data by base64
      * @param  {String} data to encode
@@ -357,6 +420,11 @@ function QiniuJsSDK() {
     this.URLSafeBase64Encode = function(v) {
         v = this.base64_encode(v);
         return v.replace(/\//g, '_').replace(/\+/g, '-');
+    };
+
+    this.URLSafeBase64Decode = function(v) {
+        v = v.replace(/_/g, '/').replace(/-/g, '+');
+        return this.base64_decode(v);
     };
 
     // TODO: use mOxie
@@ -487,7 +555,7 @@ function QiniuJsSDK() {
             var ie = that.detectIEVersion();
             var BLOCK_BITS, MAX_CHUNK_SIZE, chunk_size;
             // case Safari 5、Windows 7、iOS 7 set isSpecialSafari to true
-            var isSpecialSafari = (mOxie.Env.browser === "Safari" && mOxie.Env.version <= 5 && mOxie.Env.os === "Windows" && mOxie.Env.osVersion === "7") || (mOxie.Env.browser === "Safari" && mOxie.Env.os === "iOS" && mOxie.Env.osVersion === "7");
+            var isSpecialSafari = (moxie.core.utils.Env.browser === "Safari" && moxie.core.utils.Env.version <= 5 && moxie.core.utils.Env.os === "Windows" && moxie.core.utils.Env.osVersion === "7") || (moxie.core.utils.Env.browser === "Safari" && moxie.core.utils.Env.os === "iOS" && moxie.core.utils.Env.osVersion === "7");
             // case IE 9-，chunk_size is not empty and flash is included in runtimes
             // set op.chunk_size to zero
             //if (ie && ie < 9 && op.chunk_size && op.runtimes.indexOf('flash') >= 0) {
@@ -514,15 +582,110 @@ function QiniuJsSDK() {
             // if op.chunk_size set 0 will be cause to direct upload
         };
 
-        // getUptoken maybe called at Init Event or BeforeUpload Event
+        var getHosts = function(hosts) {
+            var result = [];
+            var uploadIndex = -1;
+            for (var i = 0; i < hosts.length; i++) {
+                var host = hosts[i];
+                if (host.indexOf("upload") !== -1) {
+                    uploadIndex = i;
+                }
+                if (host.indexOf('-H') === 0) {
+                    result.push(host.split(' ')[2]);
+                } else {
+                    result.push(host);
+                }
+            }
+
+            if (uploadIndex !== -1) {
+                //make upload domains first
+                var uploadDomain = result[uploadIndex];
+                result[uploadIndex] = result[0];
+                result[0] = uploadDomain;
+            }
+            return result;
+        };
+
+        var getPutPolicy = function (uptoken) {
+            var segments = uptoken.split(":");
+            var ak = segments[0];
+            var putPolicy = that.parseJSON(that.URLSafeBase64Decode(segments[2]));
+            putPolicy.ak = ak;
+            if (putPolicy.scope.indexOf(":") >= 0) {
+                putPolicy.bucket = putPolicy.scope.split(":")[0];
+                putPolicy.key = putPolicy.scope.split(":")[1];
+            } else {
+                putPolicy.bucket = putPolicy.scope;
+            }
+            return putPolicy;
+        };
+
+        var getUpHosts = function(uptoken) {
+            var putPolicy = getPutPolicy(uptoken);
+            // var uphosts_url = "//uc.qbox.me/v1/query?ak="+ak+"&bucket="+putPolicy.scope;
+            // IE9 does not support protocol relative url
+            var uphosts_url = window.location.protocol + "//uc.qbox.me/v1/query?ak=" + putPolicy.ak + "&bucket=" + putPolicy.bucket;
+            logger.debug("putPolicy: ", putPolicy);
+            logger.debug("get uphosts from: ", uphosts_url);
+            var ie = that.detectIEVersion();
+            var ajax;
+            if (ie && ie <= 9) {
+                ajax = new moxie.xhr.XMLHttpRequest();
+                moxie.core.utils.Env.swf_url = op.flash_swf_url;
+            }else{
+                ajax = that.createAjax();
+            }
+            ajax.open('GET', uphosts_url, false);
+            var onreadystatechange = function(){
+                logger.debug("ajax.readyState: ", ajax.readyState);
+                if (ajax.readyState === 4) {
+                    logger.debug("ajax.status: ", ajax.status);
+                    if (ajax.status < 400) {
+                        var res = that.parseJSON(ajax.responseText);
+                        qiniuUpHosts.http = getHosts(res.http.up);
+                        qiniuUpHosts.https = getHosts(res.https.up);
+                        logger.debug("get new uphosts: ", qiniuUpHosts);
+                        that.resetUploadUrl();
+                    } else {
+                        logger.error("get uphosts error: ", ajax.responseText);
+                    }
+                }
+            };
+            if (ie && ie <= 9) {
+                ajax.bind('readystatechange', onreadystatechange);
+            }else{
+                ajax.onreadystatechange = onreadystatechange;
+            }
+            ajax.send();
+            // ajax.send();
+            // if (ajax.status < 400) {
+            //     var res = that.parseJSON(ajax.responseText);
+            //     qiniuUpHosts.http = getHosts(res.http.up);
+            //     qiniuUpHosts.https = getHosts(res.https.up);
+            //     logger.debug("get new uphosts: ", qiniuUpHosts);
+            //     that.resetUploadUrl();
+            // } else {
+            //     logger.error("get uphosts error: ", ajax.responseText);
+            // }
+            return;
+        };
+
+        var getUptoken = function(file) {
+            if (!that.token || (op.uptoken_url && that.tokenInfo.isExpired())) {
+                return getNewUpToken(file);
+            } else {
+                return that.token;
+            }
+        };
+
+        // getNewUptoken maybe called at Init Event or BeforeUpload Event
         // case Init Event, the file param of getUptken will be set a null value
         // if op.uptoken has value, set uptoken with op.uptoken
         // else if op.uptoken_url has value, set uptoken from op.uptoken_url
         // else if op.uptoken_func has value, set uptoken by result of op.uptoken_func
-        var getUpToken = function(file) {
+        var getNewUpToken = function(file) {
             if (op.uptoken) {
                 that.token = op.uptoken;
-                return;
             } else if (op.uptoken_url) {
                 logger.debug("get uptoken from: ", that.uptoken_url);
                 // TODO: use mOxie
@@ -539,24 +702,53 @@ function QiniuJsSDK() {
                 if (ajax.status === 200) {
                     var res = that.parseJSON(ajax.responseText);
                     that.token = res.uptoken;
-                    logger.debug("get new uptoken: ", res.uptoken);
+                    var segments = that.token.split(":");
+                    var putPolicy = that.parseJSON(that.URLSafeBase64Decode(segments[2]));
+                    if (!that.tokenMap) {
+                        that.tokenMap = {};
+                    }
+                    var getTimestamp = function(time) {
+                        return Math.ceil(time.getTime()/1000);
+                    };
+                    var serverTime = getTimestamp(new Date(ajax.getResponseHeader("date")));
+                    var clientTime = getTimestamp(new Date());
+                    that.tokenInfo = {
+                        serverDelay: clientTime - serverTime,
+                        deadline: putPolicy.deadline,
+                        isExpired: function() {
+                            var leftTime = this.deadline - getTimestamp(new Date()) + this.serverDelay;
+                            return leftTime < 600;
+                        }
+                    };
+                    logger.debug("get new uptoken: ", that.token);
+                    logger.debug("get token info: ", that.tokenInfo);
                 } else {
                     logger.error("get uptoken error: ", ajax.responseText);
                 }
-                return;
             } else if (op.uptoken_func) {
                 logger.debug("get uptoken from uptoken_func");
                 that.token = op.uptoken_func(file);
                 logger.debug("get new uptoken: ", that.token);
-                return;
             } else {
                 logger.error("one of [uptoken, uptoken_url, uptoken_func] settings in options is required!");
             }
+            if (that.token) {
+                getUpHosts(that.token);
+            }
+            return that.token;
         };
 
         // get file key according with the user passed options
         var getFileKey = function(up, file, func) {
-            // TODO: save_key can read from scope of token
+            // WARNING
+            // When you set the key in putPolicy by "scope": "bucket:key"
+            // You should understand the risk of override a file in the bucket
+            // So the code below that automatically get key from uptoken has been commented
+            // var putPolicy = getPutPolicy(that.token)
+            // if (putPolicy.key) {
+            //     logger.debug("key is defined in putPolicy.scope: ", putPolicy.key)
+            //     return putPolicy.key
+            // }
             var key = '',
                 unique_names = false;
             if (!op.save_key) {
@@ -594,7 +786,7 @@ function QiniuJsSDK() {
 
         logger.debug("init uploader start");
 
-        logger.debug("environment: ", mOxie.Env);
+        logger.debug("environment: ", moxie.core.utils.Env);
 
         logger.debug("userAgent: ", navigator.userAgent);
 
@@ -626,13 +818,22 @@ function QiniuJsSDK() {
         logger.debug("invoke reset_chunk_size()");
         logger.debug("op.chunk_size: ", op.chunk_size);
 
-        // compose options with user passed options and default setting
-        plupload.extend(option, op, {
+        var defaultSetting = {
             url: qiniuUploadUrl,
             multipart_params: {
                 token: ''
             }
-        });
+        };
+        var ie = that.detectIEVersion();
+        // case IE 9-
+        // add accept in multipart params
+        if (ie && ie <= 9) {
+            defaultSetting.multipart_params.accept = 'text/plain; charset=utf-8';
+            logger.debug("add accept text/plain in multipart params");
+        }
+
+        // compose options with user passed options and default setting
+        plupload.extend(option, op, defaultSetting);
 
         logger.debug("option: ", option);
 
@@ -641,17 +842,17 @@ function QiniuJsSDK() {
 
         logger.debug("new plupload.Uploader(option)");
 
-        // bind getUpToken to 'Init' event
+        // bind getNewUpToken to 'Init' event
         uploader.bind('Init', function(up, params) {
             logger.debug("Init event activated");
             // if op.get_new_uptoken is not true
-            //      invoke getUptoken when uploader init
+            //      invoke getNewUptoken when uploader init
             // else
-            //      getUptoken everytime before a new file upload
+            //      getNewUptoken everytime before a new file upload
             if(!op.get_new_uptoken){
-                getUpToken(null);
+                getNewUpToken(null);
             }
-            //getUpToken(null);
+            //getNewUpToken(null);
         });
 
         logger.debug("bind Init event");
@@ -668,7 +869,7 @@ function QiniuJsSDK() {
 
             // detect is iOS
             var is_ios = function (){
-                if(mOxie.Env.OS.toLowerCase()==="ios") {
+                if(moxie.core.utils.Env.OS.toLowerCase()==="ios") {
                     return true;
                 } else {
                     return false;
@@ -713,7 +914,7 @@ function QiniuJsSDK() {
             ctx = '';
 
             if(op.get_new_uptoken){
-                getUpToken(file);
+                getNewUpToken(file);
             }
 
             var directUpload = function(up, file, func) {
@@ -728,6 +929,13 @@ function QiniuJsSDK() {
                         'key': getFileKey(up, file, func),
                         'token': that.token
                     };
+                }
+                var ie = that.detectIEVersion();
+                // case IE 9-
+                // add accept in multipart params
+                if (ie && ie <= 9) {
+                    multipart_params_obj.accept = 'text/plain; charset=utf-8';
+                    logger.debug("add accept text/plain in multipart params");
                 }
 
                 logger.debug("directUpload multipart_params_obj: ", multipart_params_obj);
@@ -745,7 +953,6 @@ function QiniuJsSDK() {
                     }
                 }
 
-
                 up.setOption({
                     'url': qiniuUploadUrl,
                     'multipart': true,
@@ -757,7 +964,7 @@ function QiniuJsSDK() {
             // detect is weixin or qq inner browser
             var is_android_weixin_or_qq = function (){
                 var ua = navigator.userAgent.toLowerCase();
-                if((ua.match(/MicroMessenger/i) || mOxie.Env.browser === "QQBrowser" || ua.match(/V1_AND_SQ/i)) && mOxie.Env.OS.toLowerCase()==="android") {
+                if((ua.match(/MicroMessenger/i) || moxie.core.utils.Env.browser === "QQBrowser" || ua.match(/V1_AND_SQ/i)) && moxie.core.utils.Env.OS.toLowerCase()==="android") {
                     return true;
                 } else {
                     return false;
@@ -778,7 +985,7 @@ function QiniuJsSDK() {
                     directUpload(up, file, that.key_handler);
                 } else {
                     // TODO: need a polifill to make it work in IE 9-
-                    // ISSUE: if file.name is existed in localStorage 
+                    // ISSUE: if file.name is existed in localStorage
                     // but not the same file maybe cause error
                     var localFileInfo = localStorage.getItem(file.name);
                     var blockSize = chunk_size;
@@ -797,7 +1004,7 @@ function QiniuJsSDK() {
 
                             if (localFileInfo.percent !== 100) {
                                 if (file.size === localFileInfo.total) {
-                                    // TODO: if file.name and file.size is the same 
+                                    // TODO: if file.name and file.size is the same
                                     // but not the same file will cause error
                                     file.percent = localFileInfo.percent;
                                     file.loaded = localFileInfo.offset;
@@ -827,6 +1034,14 @@ function QiniuJsSDK() {
                         }
                     }
                     speedCalInfo.startTime = new Date().getTime();
+                    var multipart_params_obj = {};
+                    var ie = that.detectIEVersion();
+                    // case IE 9-
+                    // add accept in multipart params
+                    if (ie && ie <= 9) {
+                        multipart_params_obj.accept = 'text/plain; charset=utf-8';
+                        logger.debug("add accept text/plain in multipart params");
+                    }
                     // TODO: to support bput
                     // http://developer.qiniu.com/docs/v6/api/reference/up/bput.html
                     up.setOption({
@@ -835,9 +1050,9 @@ function QiniuJsSDK() {
                         'chunk_size': chunk_size,
                         'required_features': "chunks",
                         'headers': {
-                            'Authorization': 'UpToken ' + that.token
+                            'Authorization': 'UpToken ' + getUptoken(file)
                         },
-                        'multipart_params': {}
+                        'multipart_params': multipart_params_obj
                     });
                 }
             } else {
@@ -868,10 +1083,10 @@ function QiniuJsSDK() {
         // store the chunk upload info and set next chunk upload url
         uploader.bind('ChunkUploaded', function(up, file, info) {
             logger.debug("ChunkUploaded event activated");
-            logger.debug("file: ", file);
-            logger.debug("info: ", info);
+            logger.debug("ChunkUploaded file: ", file);
+            logger.debug("ChunkUploaded info: ", info);
             var res = that.parseJSON(info.response);
-            logger.debug("res: ", res);
+            logger.debug("ChunkUploaded res: ", res);
             // ctx should look like '[chunk01_ctx],[chunk02_ctx],[chunk03_ctx],...'
             ctx = ctx ? ctx + ',' + res.ctx : res.ctx;
             var leftSize = info.total - info.offset;
@@ -883,6 +1098,11 @@ function QiniuJsSDK() {
                 });
                 logger.debug("up.setOption url: ", qiniuUploadUrl + '/mkblk/' + leftSize);
             }
+            up.setOption({
+                'headers': {
+                    'Authorization': 'UpToken ' + getUptoken(file)
+                }
+            });
             localStorage.setItem(file.name, that.stringifyJSON({
                 ctx: ctx,
                 percent: file.percent,
@@ -1024,9 +1244,10 @@ function QiniuJsSDK() {
         uploader.bind('FileUploaded', (function(_FileUploaded_Handler) {
             return function(up, file, info) {
                 logger.debug("FileUploaded event activated");
-                logger.debug("file: ", file);
-                logger.debug("info: ", info);
+                logger.debug("FileUploaded file: ", file);
+                logger.debug("FileUploaded info: ", info);
                 var last_step = function(up, file, info) {
+                    logger.debug("FileUploaded last step:",info);
                     if (op.downtoken_url) {
                         // if op.dowontoken_url is not empty
                         // need get downtoken before invoke the _FileUploaded_Handler
@@ -1043,7 +1264,7 @@ function QiniuJsSDK() {
                                         throw ('invalid json format');
                                     }
                                     var info_extended = {};
-                                    plupload.extend(info_extended, that.parseJSON(info), res_downtoken);
+                                    plupload.extend(info_extended, that.parseJSON(info.response), res_downtoken);
                                     if (_FileUploaded_Handler) {
                                         _FileUploaded_Handler(up, file, that.stringifyJSON(info_extended));
                                     }
@@ -1057,7 +1278,7 @@ function QiniuJsSDK() {
                                 }
                             }
                         };
-                        ajax_downtoken.send('key=' + that.parseJSON(info).key + '&domain=' + op.domain);
+                        ajax_downtoken.send('key=' + that.parseJSON(info.response).key + '&domain=' + op.domain);
                     } else if (_FileUploaded_Handler) {
                         _FileUploaded_Handler(up, file, info);
                     }
@@ -1065,12 +1286,12 @@ function QiniuJsSDK() {
 
                 var res = that.parseJSON(info.response);
                 ctx = ctx ? ctx : res.ctx;
-                // if ctx is not empty 
+                // if ctx is not empty
                 //      that means the upload strategy is chunk upload
-                //      befroe the invoke the last_step
+                //      before the invoke the last_step
                 //      we need request the mkfile to compose all uploaded chunks
                 // else
-                //      invalke the last_step
+                //      invoke the last_step
                 logger.debug("ctx: ", ctx);
                 if (ctx) {
                     var key = '';
@@ -1104,8 +1325,8 @@ function QiniuJsSDK() {
                     var ie = that.detectIEVersion();
                     var ajax;
                     if (ie && ie <= 9) {
-                        ajax = new mOxie.XMLHttpRequest();
-                        mOxie.Env.swf_url = op.flash_swf_url;
+                        ajax = new moxie.xhr.XMLHttpRequest();
+                        moxie.core.utils.Env.swf_url = op.flash_swf_url;
                     }else{
                         ajax = that.createAjax();
                     }
@@ -1116,20 +1337,25 @@ function QiniuJsSDK() {
                         logger.debug("ajax.readyState: ", ajax.readyState);
                         if (ajax.readyState === 4) {
                             localStorage.removeItem(file.name);
-                            var info;
+                            var ajaxInfo;
                             if (ajax.status === 200) {
-                                info = ajax.responseText;
-                                logger.debug("mkfile is success: ", info);
-                                last_step(up, file, info);
+                                ajaxInfo = {
+                                    status: ajax.status,
+                                    response: ajax.responseText,
+                                    responseHeaders: ajax.getAllResponseHeaders(),
+                                };
+                                logger.debug("mkfile is success: ", ajaxInfo);
+                                last_step(up, file, ajaxInfo);
                             } else {
-                                info = {
+                                ajaxInfo = {
                                     status: ajax.status,
                                     response: ajax.responseText,
                                     file: file,
-                                    code: -200
+                                    code: -200,
+                                    responseHeaders: ajax.getAllResponseHeaders()
                                 };
-                                logger.debug("mkfile is error: ", info);
-                                uploader.trigger('Error', info);
+                                logger.debug("mkfile is error: ", ajaxInfo);
+                                uploader.trigger('Error', ajaxInfo);
                             }
                         }
                     };
@@ -1141,7 +1367,7 @@ function QiniuJsSDK() {
                     ajax.send(ctx);
                     logger.debug("mkfile: ", url);
                 } else {
-                    last_step(up, file, info.response);
+                    last_step(up, file, info);
                 }
 
             };
@@ -1151,7 +1377,6 @@ function QiniuJsSDK() {
 
         // init uploader
         uploader.init();
-
         logger.debug("invoke uploader.init()");
 
         logger.debug("init uploader end");
@@ -1183,14 +1408,17 @@ function QiniuJsSDK() {
      * @return {String} url of processed image
      */
     this.imageView2 = function(op, key) {
-        var mode = op.mode || '',
+
+        if (!/^\d$/.test(op.mode)) {
+            return false;
+        }
+
+        var mode = op.mode,
             w = op.w || '',
             h = op.h || '',
             q = op.q || '',
             format = op.format || '';
-        if (!mode) {
-            return false;
-        }
+
         if (!w && !h) {
             return false;
         }
