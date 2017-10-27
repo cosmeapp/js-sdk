@@ -85,7 +85,7 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
 <a id="usage"></a>
 ### 准备
 
-- JS-SDK 的上传功能基于 [Plupload](http://www.plupload.com/) 插件封装的，所以需要[下载 Plupload](http://plupload.com/download)，建议使用 2.1.1 版本。
+- JS-SDK 的上传功能基于 [Plupload](http://www.plupload.com/) 插件封装的，所以需要[下载 Plupload](http://plupload.com/download)。
     您也可以访问[ 开放静态文件 CDN ](http://staticfile.org/)，搜索 plupload，使用 CDN 加速的静态文件地址。
 
 - 在使用 JS-SDK 之前，您必须先注册一个七牛帐号，并登录控制台获取一对有效的 AccessKey 和 SecretKey，您可以阅读[ 快速入门 ](https://developer.qiniu.com/kodo/manual/console-quickstart)和[ 安全机制 ](https://developer.qiniu.com/kodo/manual/security#security) 以进一步了解如何正确使用和管理密钥 。
@@ -182,6 +182,7 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
 
     ```JavaScript
     var uploader = Qiniu.uploader({
+        disable_statistics_report: false,   // 禁止自动发送上传统计信息到七牛，默认允许发送
         runtimes: 'html5,flash,html4',      // 上传模式,依次退化
         browse_button: 'pickfiles',         // 上传选择的点选按钮，**必需**
         // 在初始化时，uptoken, uptoken_url, uptoken_func 三个参数中必须有一个被设置
@@ -234,7 +235,7 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
             },
             'FileUploaded': function(up, file, info) {
                    // 每个文件上传成功后,处理相关的事情
-                   // 其中 info 是文件上传成功后，服务端返回的json，形式如
+                   // 其中 info.response 是文件上传成功后，服务端返回的json，形式如
                    // {
                    //    "hash": "Fh8xVqod2MQ1mocfI4S4KpRL6D98",
                    //    "key": "gogopher.jpg"
@@ -242,7 +243,7 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
                    // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
 
                    // var domain = up.getOption('domain');
-                   // var res = parseJSON(info);
+                   // var res = parseJSON(info.response);
                    // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
             },
             'Error': function(up, err, errTip) {
@@ -466,11 +467,11 @@ Qiniu-JavaScript-SDK 的示例 Demo 中的服务器端部分是基于[ Node.js �
     ```javascript
 
     module.exports = {
-        'ACCESS_KEY': '<Your Access Key>',
-        'SECRET_KEY': '<Your Secret Key>',
-        'Bucket_Name': '<Your Bucket Name>',
+        'AccessKey': '<Your Access Key>',
+        'SecretKey': '<Your Secret Key>',
+        'Bucket': '<Your Bucket Name>',
         'Port': 19110,
-        'Uptoken_Url': '<Your Uptoken_Url>', // demo 启动后会在本地 /uptoken 上提供获取 uptoken 的接口，所以这里可以填 'uptoken'
+        'UptokenUrl': '<Your Uptoken_Url>', // demo 启动后会在本地 /uptoken 上提供获取 uptoken 的接口，所以这里可以填 'uptoken'
         'Domain': '<Your Bucket Domain>' // Bucket 的外链默认域名，在 Bucket 的内容管理里查看，如：'http://xxx.bkt.clouddn.com/'
     }
 
